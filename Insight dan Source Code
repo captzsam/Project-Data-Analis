@@ -1,0 +1,205 @@
+# 📊 Analisis Penjualan E-Commerce (Project Portofolio)
+
+---
+
+## 📌 Gambaran Proyek
+
+Proyek ini bertujuan untuk menganalisis data penjualan e-commerce guna menghasilkan insight bisnis yang bermakna. Proyek ini disusun sebagai **project portofolio Data Analyst** yang cocok untuk **fresh graduate maupun career switcher** yang ingin menunjukkan kemampuan analisis data menggunakan data nyata.
+
+Analisis mencakup performa penjualan, distribusi pelanggan, serta tren produk menggunakan Python dan library analisis data umum.
+
+---
+
+## 🎯 Tujuan Proyek
+
+* Memahami performa penjualan secara keseluruhan
+* Mengidentifikasi kategori produk dengan penjualan tertinggi
+* Menganalisis tren pendapatan bulanan
+* Melihat distribusi pelanggan berdasarkan kota
+* Melatih proses data cleaning, data merging, dan visualisasi
+
+---
+
+## 🗂 Informasi Dataset
+
+**Dataset:** Brazilian E-Commerce Public Dataset (Olist)
+**Sumber:** Kaggle (dataset publik)
+
+### Tabel yang Digunakan:
+
+* orders
+* customers
+* order_items
+* products
+
+Dataset ini merepresentasikan transaksi e-commerce nyata dan sering digunakan sebagai studi kasus analisis data.
+
+---
+
+## 🛠 Tools & Teknologi
+
+* Python
+* Pandas
+* NumPy
+* Matplotlib
+* Seaborn
+* Jupyter Notebook
+
+---
+
+## 🔍 Alur Analisis
+
+1. Load data
+2. Memahami struktur data & data cleaning
+3. Menggabungkan beberapa tabel (merge)
+4. Exploratory Data Analysis (EDA)
+5. Visualisasi data
+6. Menarik insight bisnis & kesimpulan
+
+---
+
+## 📁 Struktur Repository
+
+```
+ecommerce-sales-analysis/
+│
+├── data/
+│   ├── raw/              # Dataset asli
+│   └── cleaned/          # Dataset setelah dibersihkan
+│
+├── notebooks/
+│   ├── 01_data_cleaning.ipynb
+│   └── 02_exploratory_analysis.ipynb
+│
+├── visuals/
+│   └── charts.png
+│
+├── README.md
+└── requirements.txt
+```
+
+---
+
+## 📘 Notebook 01 — Data Cleaning & Persiapan
+
+### 1️⃣ Import Library
+
+```python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+plt.style.use('default')
+```
+
+### 2️⃣ Load Dataset
+
+```python
+orders = pd.read_csv('data/raw/orders.csv')
+customers = pd.read_csv('data/raw/customers.csv')
+order_items = pd.read_csv('data/raw/order_items.csv')
+products = pd.read_csv('data/raw/products.csv')
+```
+
+### 3️⃣ Pengecekan Awal Data
+
+```python
+orders.head()
+orders.info()
+orders.isna().sum()
+```
+
+📌 *Tujuan:* memahami struktur data dan mendeteksi missing value.
+
+### 4️⃣ Data Cleaning
+
+```python
+orders['order_purchase_timestamp'] = pd.to_datetime(
+    orders['order_purchase_timestamp']
+)
+
+orders = orders.dropna()
+```
+
+### 5️⃣ Menggabungkan Dataset
+
+```python
+merged_df = order_items.merge(orders, on='order_id') \
+                       .merge(customers, on='customer_id') \
+                       .merge(products, on='product_id')
+```
+
+---
+
+## 📊 Notebook 02 — Exploratory Data Analysis (EDA)
+
+### 1️⃣ Membuat Kolom Revenue
+
+```python
+merged_df['revenue'] = merged_df['price'] + merged_df['freight_value']
+```
+
+### 2️⃣ Total Revenue
+
+```python
+total_revenue = merged_df['revenue'].sum()
+total_revenue
+```
+
+### 3️⃣ Tren Revenue Bulanan
+
+```python
+merged_df['month'] = merged_df['order_purchase_timestamp'].dt.to_period('M')
+
+monthly_revenue = merged_df.groupby('month')['revenue'].sum()
+
+monthly_revenue.plot(kind='line', figsize=(10,5))
+plt.title('Tren Revenue Bulanan')
+plt.xlabel('Bulan')
+plt.ylabel('Revenue')
+plt.show()
+```
+
+### 4️⃣ 10 Kategori Produk dengan Revenue Tertinggi
+
+```python
+top_categories = merged_df.groupby('product_category_name')['revenue'] \
+                          .sum() \
+                          .sort_values(ascending=False) \
+                          .head(10)
+
+sns.barplot(x=top_categories.values, y=top_categories.index)
+plt.title('10 Kategori Produk dengan Revenue Tertinggi')
+plt.show()
+```
+
+### 5️⃣ 10 Kota dengan Jumlah Order Terbanyak
+
+```python
+city_orders = merged_df['customer_city'].value_counts().head(10)
+
+city_orders.plot(kind='bar', figsize=(8,4))
+plt.title('10 Kota dengan Jumlah Order Terbanyak')
+plt.xlabel('Kota')
+plt.ylabel('Jumlah Order')
+plt.show()
+```
+
+---
+
+## 📌 Insight Bisnis
+
+* Sebagian kecil kategori produk menyumbang sebagian besar total revenue.
+* Terdapat tren penjualan bulanan yang mengindikasikan pola musiman.
+* Kota-kota besar mendominasi jumlah transaksi, menunjukkan konsentrasi pasar di area urban.
+
+---
+
+## 🚀 Pengembangan Selanjutnya
+
+* Menambahkan analisis menggunakan SQL
+* Membuat dashboard Power BI atau Tableau
+* Segmentasi pelanggan
+* Prediksi tren penjualan
+
